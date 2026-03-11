@@ -38,7 +38,7 @@ export default function Sidebar({ categories }: Props) {
     const main = document.getElementById('mainWrapper')
     if (collapsed && sidebar && main) {
       sidebar.classList.add('collapsed')
-      main.style.marginLeft = '0'
+      main.style.marginLeft = '40px'
     }
   }, [])
 
@@ -55,7 +55,7 @@ export default function Sidebar({ categories }: Props) {
     const main = document.getElementById('mainWrapper')
     if (!sidebar) return
     const collapsed = sidebar.classList.toggle('collapsed')
-    if (main) main.style.marginLeft = collapsed ? '0' : 'var(--sidebar-width)'
+    if (main) main.style.marginLeft = collapsed ? '40px' : 'var(--sidebar-width)'
     localStorage.setItem('sidebar-collapsed', String(collapsed))
   }
 
