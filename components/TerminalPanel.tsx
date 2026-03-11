@@ -1,7 +1,8 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 const TTYD_URL = 'http://localhost:7681'
+const DEFAULT_WIDTH = 380
 
 interface Props {
   notePath: string
@@ -12,8 +13,12 @@ export default function TerminalPanel({ notePath }: Props) {
   const [online, setOnline] = useState(true)
   const [copied, setCopied] = useState(false)
   const [showHint, setShowHint] = useState(false)
+  const [width, setWidth] = useState(DEFAULT_WIDTH)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const resizing = useRef(false)
+  const startX = useRef(0)
+  const startWidth = useRef(DEFAULT_WIDTH)
 
   async function checkTtyd() {
     try {
@@ -76,6 +81,29 @@ export default function TerminalPanel({ notePath }: Props) {
     })
   }
 
+  const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    resizing.current = true
+    startX.current = e.clientX
+    startWidth.current = width
+    panelRef.current?.classList.add('resizing')
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!resizing.current) return
+      const delta = startX.current - ev.clientX
+      const next = Math.max(280, Math.min(window.innerWidth * 0.9, startWidth.current + delta))
+      setWidth(next)
+    }
+    const onMouseUp = () => {
+      resizing.current = false
+      panelRef.current?.classList.remove('resizing')
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+    }
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+  }, [width])
+
   return (
     <>
       <button
@@ -84,7 +112,8 @@ export default function TerminalPanel({ notePath }: Props) {
       >
         AI Edit
       </button>
-      <div ref={panelRef} className={`terminal-panel${open ? ' open' : ''}`}>
+      <div ref={panelRef} className={`terminal-panel${open ? ' open' : ''}`} style={{ width }}>
+        <div className="terminal-resize-handle" onMouseDown={onResizeMouseDown} />
         <div className="terminal-toolbar">
           <span className="terminal-title">🤖 AI Terminal</span>
           <div className="terminal-actions">
@@ -107,7 +136,7 @@ export default function TerminalPanel({ notePath }: Props) {
             <div className="terminal-offline-inner">
               <span className="terminal-offline-icon">🔌</span>
               <p>Terminal 未連線</p>
-              <code>ttyd -p 7681 bash</code>
+              <code>ttyd -p 7681 --url-arg bash</code>
               <button className="terminal-retry-btn" onClick={handleRetry}>重試連線</button>
             </div>
           </div>

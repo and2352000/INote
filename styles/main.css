@@ -415,6 +415,8 @@ a:hover { text-decoration: underline; }
   top: var(--topbar-height);
   bottom: 0;
   width: 480px;
+  min-width: 280px;
+  max-width: 90vw;
   background: #1e1e1e;
   border-left: 1px solid #333;
   display: flex;
@@ -426,6 +428,21 @@ a:hover { text-decoration: underline; }
   overflow: hidden;
 }
 .terminal-panel.open { transform: translateX(0); }
+.terminal-panel.resizing { transition: none; user-select: none; }
+
+.terminal-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: ew-resize;
+  z-index: 10;
+}
+.terminal-resize-handle:hover,
+.terminal-resize-handle:active {
+  background: rgba(100, 150, 255, 0.3);
+}
 
 .terminal-toolbar {
   display: flex;
