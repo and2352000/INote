@@ -7,7 +7,8 @@ Next.js 15+ 靜態筆記知識庫，從 Hugo 遷移而來。解決 Hugo live rel
 ## 技術棧
 
 - **框架**: Next.js 16+ (App Router, SSG)
-- **Markdown**: `next-mdx-remote` v6 (RSC)
+- **Markdown (SSR)**: `next-mdx-remote` v6 (RSC)
+- **Markdown (編輯預覽)**: `react-markdown` v10 + `remark-gfm`
 - **Front matter**: `gray-matter`
 - **樣式**: CSS Modules / 純 CSS（沿用原 Hugo CSS Variables 設計）
 - **File watcher**: `chokidar` + `ws` WebSocket server（透過 `tsx` 執行）
@@ -23,9 +24,10 @@ note-next/
 │   ├── [category]/
 │   │   ├── page.tsx            # 分類文章列表頁
 │   │   └── [slug]/
-│   │       └── page.tsx        # 文章頁（含 TerminalPanel）
+│   │       └── page.tsx        # 文章頁（SSR MDX，傳 rawContent 給 ArticleClient）
 │   └── api/
 │       ├── revalidate/route.ts # on-demand revalidation
+│       ├── save/route.ts       # 儲存 markdown 至磁碟（POST { filePath, content }）
 │       └── search/route.ts     # 搜尋 API
 ├── components/
 │   ├── Sidebar.tsx             # 側欄導覽（折疊、active state）
@@ -33,6 +35,8 @@ note-next/
 │   ├── ThemeToggle.tsx         # 深色模式切換
 │   ├── TerminalPanel.tsx       # AI Terminal 滑入面板（iframe ttyd）
 │   ├── Topbar.tsx              # 頂部欄（breadcrumb、actions）
+│   ├── ArticleClient.tsx       # 文章頁 client wrapper（管理 view/edit 模式切換）
+│   ├── MarkdownEditor.tsx      # 分割畫面 Markdown 編輯器（textarea + react-markdown 預覽）
 │   └── FileWatcher.tsx         # 掛載 useFileWatch hook 的 client component
 ├── hooks/
 │   └── useFileWatch.ts         # WebSocket 監聽 → router.refresh()
@@ -118,6 +122,19 @@ draft: false
 ---
 ```
 
+## 網頁內 Markdown 編輯
+
+文章頁 Topbar 有 ✏️ 編輯 / 👁 閱讀 切換按鈕：
+
+- **閱讀模式**：顯示 SSR 渲染的 MDX（zero client JS）
+- **編輯模式**：分割畫面
+  - 左側：monospace textarea，內容為完整原始檔案（含 front matter）
+  - 右側：`react-markdown` 即時預覽
+  - 停止輸入 1.5 秒後自動 debounce 儲存 → `POST /api/save`
+  - 儲存後 chokidar 偵測變更 → revalidate → 切回閱讀模式即反映最新內容
+
+`/api/save` 安全限制：filePath 必須在 `content/` 目錄內，否則回傳 400。
+
 ## 注意事項
 
 - `content/` 下的 `_index.md` 為分類 metadata（title、description），不會出現在文章列表
@@ -125,3 +142,4 @@ draft: false
 - 搜尋走 `/api/search`，依 title / description / tags 比對，回傳前 8 筆
 - `watcher.ts` 已整合進 `npm run dev`（透過 `concurrently` 同時啟動）
 - `TerminalPanel` 連線至 `http://localhost:7681`（ttyd），未啟動時顯示離線狀態
+- 編輯器 rawContent 包含完整 front matter，使用者可直接編輯 metadata
