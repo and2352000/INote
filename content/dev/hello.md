@@ -15,6 +15,4 @@ tags: ["範例"]
 - **全文搜尋** - 快速找到筆記
 - **Markdown 支援** - 完整 Markdown 渲染
 
-```bash
-hugo server -D
-```
+
