@@ -784,3 +784,32 @@ a:hover { text-decoration: underline; }
 }
 .modal-btn-submit:hover { background: var(--accent-hover); }
 .modal-btn-submit:disabled, .modal-btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Context Menu */
+.context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  z-index: 9999;
+  min-width: 160px;
+  padding: 4px 0;
+}
+.context-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text);
+  transition: background 0.1s;
+}
+.context-menu-item:hover { background: var(--bg-hover); }
+.context-menu-item-danger { color: #e74c3c; }
+.context-menu-item-danger:hover { background: rgba(231,76,60,0.1); }
+[data-theme="dark"] .context-menu-item-danger { color: #fc8181; }
+[data-theme="dark"] .context-menu-item-danger:hover { background: rgba(252,129,129,0.1); }

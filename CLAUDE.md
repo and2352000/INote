@@ -26,17 +26,20 @@ note-next/
 │   │   └── [slug]/
 │   │       └── page.tsx        # 文章頁（SSR MDX，傳 rawContent 給 ArticleClient）
 │   └── api/
-│       ├── revalidate/route.ts # on-demand revalidation
-│       ├── save/route.ts       # 儲存 markdown 至磁碟（POST { filePath, content }）
-│       └── search/route.ts     # 搜尋 API
+│       ├── revalidate/route.ts  # on-demand revalidation
+│       ├── save/route.ts        # 儲存 markdown 至磁碟（POST { filePath, content }）
+│       ├── new-category/route.ts# 新增分類（POST { name, title, description }）
+│       ├── new-article/route.ts # 新增文章（POST { category, slug, title }）
+│       └── search/route.ts      # 搜尋 API
 ├── components/
-│   ├── Sidebar.tsx             # 側欄導覽（折疊、active state）
+│   ├── Sidebar.tsx             # 側欄導覽（折疊、active state、新增分類/文章入口）
 │   ├── Search.tsx              # 搜尋框（debounce, /api/search）
 │   ├── ThemeToggle.tsx         # 深色模式切換
 │   ├── TerminalPanel.tsx       # AI Terminal 滑入面板（iframe ttyd）
 │   ├── Topbar.tsx              # 頂部欄（breadcrumb、actions）
 │   ├── ArticleClient.tsx       # 文章頁 client wrapper（管理 view/edit 模式切換）
 │   ├── MarkdownEditor.tsx      # 分割畫面 Markdown 編輯器（textarea + react-markdown 預覽）
+│   ├── CreationModal.tsx       # 新增分類 / 新增文章 modal（slug 自動從標題生成）
 │   └── FileWatcher.tsx         # 掛載 useFileWatch hook 的 client component
 ├── hooks/
 │   └── useFileWatch.ts         # WebSocket 監聽 → router.refresh()
@@ -134,6 +137,16 @@ draft: false
   - 儲存後 chokidar 偵測變更 → revalidate → 切回閱讀模式即反映最新內容
 
 `/api/save` 安全限制：filePath 必須在 `content/` 目錄內，否則回傳 400。
+
+## 新增分類 / 新增文章（UI）
+
+Sidebar 底部有 **+ 新增分類** 按鈕；每個分類 header hover 時出現 **+** 按鈕可新增文章。兩者皆開啟 `CreationModal`。
+
+**新增分類欄位：** 分類 ID（`^[a-z0-9-]+$`）、顯示名稱、說明（選填）
+**新增文章欄位：** 分類（下拉）、標題、Slug（自動從標題生成，可手動覆蓋）
+
+- API 驗證格式後建立檔案 → `revalidatePath` → modal 關閉並跳轉到新頁面
+- 分類 ID / Slug 衝突時回傳 409
 
 ## 注意事項
 
