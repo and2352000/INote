@@ -31,3 +31,7 @@ Thumbs.db
 # Cache
 .turbo/
 .cache/
+
+
+public/images/**
+!public/images/.gitkeep
