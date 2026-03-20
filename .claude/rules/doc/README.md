@@ -11,12 +11,12 @@ paths:
 每個功能在 `doc/` 下建立獨立資料夾：
 
 ```
-doc/{yyyy-mm-dd}-{feature-name}/
+doc/{yyyy-mm-dd}-{count}-{feature-name}/
 ├── user-story.md
 └── tech-spec.md
 ```
 
-範例：`doc/2026-03-14-sidebar-search/`
+範例：`doc/2026-03-14-1-sidebar-search/`
 
 ## 開發流程
 
