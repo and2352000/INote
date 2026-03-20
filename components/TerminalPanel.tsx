@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-const TTYD_URL = 'http://localhost:7681'
+const TTYD_URL = '/terminal'
+const TTYD_DIRECT_URL = 'http://localhost:7681'
 const DEFAULT_WIDTH = 380
 
 interface Props {
@@ -22,7 +23,7 @@ export default function TerminalPanel({ notePath }: Props) {
 
   async function checkTtyd() {
     try {
-      await fetch(TTYD_URL, { mode: 'no-cors', cache: 'no-store' })
+      await fetch(TTYD_DIRECT_URL, { mode: 'no-cors', cache: 'no-store' })
       return true
     } catch {
       return false
@@ -87,6 +88,7 @@ export default function TerminalPanel({ notePath }: Props) {
     startX.current = e.clientX
     startWidth.current = width
     panelRef.current?.classList.add('resizing')
+    if (iframeRef.current) iframeRef.current.style.pointerEvents = 'none'
 
     const onMouseMove = (ev: MouseEvent) => {
       if (!resizing.current) return
@@ -94,14 +96,15 @@ export default function TerminalPanel({ notePath }: Props) {
       const next = Math.max(280, Math.min(window.innerWidth * 0.9, startWidth.current + delta))
       setWidth(next)
     }
-    const onMouseUp = () => {
+    const stopResize = () => {
       resizing.current = false
       panelRef.current?.classList.remove('resizing')
+      if (iframeRef.current) iframeRef.current.style.pointerEvents = ''
       document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
+      document.removeEventListener('mouseup', stopResize)
     }
     document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
+    document.addEventListener('mouseup', stopResize)
   }, [width])
 
   return (
@@ -141,7 +144,16 @@ export default function TerminalPanel({ notePath }: Props) {
             </div>
           </div>
         )}
-        <iframe ref={iframeRef} className="terminal-iframe" title="AI Terminal" />
+        <iframe
+          ref={iframeRef}
+          className="terminal-iframe"
+          title="AI Terminal"
+          tabIndex={0}
+          onLoad={() => {
+            iframeRef.current?.focus()
+            try { iframeRef.current?.contentWindow?.focus() } catch {}
+          }}
+        />
       </div>
     </>
   )
