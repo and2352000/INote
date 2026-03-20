@@ -316,6 +316,56 @@ a:hover { text-decoration: underline; }
 .note-card p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
 .note-card time { font-size: 0.75rem; color: var(--text-muted); }
 
+/* Tags */
+.note-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.note-tag {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--accent-bg, rgba(59,130,246,0.1));
+  color: var(--accent);
+}
+
+/* View Toggle */
+.view-toggle { display: flex; gap: 2px; }
+.view-toggle-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, border-color 0.15s;
+}
+.view-toggle-btn:hover { color: var(--text); border-color: var(--text-muted); }
+.view-toggle-btn.active { color: var(--accent); border-color: var(--accent); }
+
+/* View Modes */
+.notes-grid.view-list {
+  grid-template-columns: 1fr;
+}
+.notes-grid.view-list .note-card {
+  flex-direction: row;
+  align-items: center;
+}
+.notes-grid.view-list .note-card-icon { display: none; }
+.notes-grid.view-list .note-card h3 { margin-bottom: 0; }
+.notes-grid.view-list .note-card > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.notes-grid.view-list .note-card p { margin-bottom: 0; }
+.notes-grid.view-list .note-card time { margin-left: auto; }
+
+.notes-grid.view-grid {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
 /* ===== List Page ===== */
 .page-list .page-header { margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
 .page-list h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
@@ -388,7 +438,7 @@ a:hover { text-decoration: underline; }
   .sidebar-toggle-mobile { display: block; }
   .content { padding: 24px 20px; }
   .home-sections { grid-template-columns: 1fr 1fr; }
-  .notes-grid { grid-template-columns: 1fr; }
+  .notes-grid, .notes-grid.view-grid { grid-template-columns: 1fr; }
 }
 
 /* ===== AI Edit Button ===== */
