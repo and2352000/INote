@@ -2,13 +2,23 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import matter from 'gray-matter'
 
 interface Props {
   rawContent: string
   notePath: string
 }
 
-type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error' | 'yaml-error'
+
+function validateFrontmatter(text: string): boolean {
+  try {
+    matter(text)
+    return true
+  } catch {
+    return false
+  }
+}
 
 export default function MarkdownEditor({ rawContent, notePath }: Props) {
   const [content, setContent] = useState(rawContent)
@@ -71,7 +81,13 @@ export default function MarkdownEditor({ rawContent, notePath }: Props) {
     const text = e.target.value
     setContent(text)
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => save(text), 1500)
+    debounceRef.current = setTimeout(() => {
+      if (!validateFrontmatter(text)) {
+        setSaveStatus('yaml-error')
+        return
+      }
+      save(text)
+    }, 1500)
   }
 
   useEffect(() => () => {
@@ -84,6 +100,7 @@ export default function MarkdownEditor({ rawContent, notePath }: Props) {
         {saveStatus === 'saving' && <span className="status-saving">儲存中…</span>}
         {saveStatus === 'saved' && <span className="status-saved">✓ 已儲存</span>}
         {saveStatus === 'error' && <span className="status-error">✕ 儲存失敗</span>}
+        {saveStatus === 'yaml-error' && <span className="status-error">⚠ YAML 格式錯誤，未儲存</span>}
         {saveStatus === 'idle' && <span className="status-idle">{notePath.split('/').pop()}</span>}
       </div>
       <div className="editor-split">

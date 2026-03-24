@@ -28,6 +28,7 @@ note-next/
 │   └── api/
 │       ├── revalidate/route.ts  # on-demand revalidation
 │       ├── save/route.ts        # 儲存 markdown 至磁碟（POST { filePath, content }）
+│       ├── upload-image/route.ts# 上傳圖片（POST multipart/form-data { file }）→ /images/...
 │       ├── new-category/route.ts# 新增分類（POST { name, title, description }）
 │       ├── new-article/route.ts # 新增文章（POST { category, slug, title }）
 │       └── search/route.ts      # 搜尋 API
@@ -39,6 +40,8 @@ note-next/
 │   ├── Topbar.tsx              # 頂部欄（breadcrumb、actions）
 │   ├── ArticleClient.tsx       # 文章頁 client wrapper（管理 view/edit 模式切換）
 │   ├── MarkdownEditor.tsx      # 分割畫面 Markdown 編輯器（textarea + react-markdown 預覽）
+│   ├── CategoryList.tsx        # 分類文章列表 client wrapper（管理 list/grid view mode）
+│   ├── ViewToggle.tsx          # 列表 / 卡片模式切換按鈕（讀寫 localStorage note-view-mode）
 │   ├── CreationModal.tsx       # 新增分類 / 新增文章 modal（slug 自動從標題生成）
 │   └── FileWatcher.tsx         # 掛載 useFileWatch hook 的 client component
 ├── hooks/
@@ -134,9 +137,28 @@ draft: false
   - 左側：monospace textarea，內容為完整原始檔案（含 front matter）
   - 右側：`react-markdown` 即時預覽
   - 停止輸入 1.5 秒後自動 debounce 儲存 → `POST /api/save`
+  - 儲存前先以 `gray-matter` 驗證 front matter YAML；格式有誤則顯示 `⚠ YAML 格式錯誤，未儲存`，跳過儲存
   - 儲存後 chokidar 偵測變更 → revalidate → 切回閱讀模式即反映最新內容
 
 `/api/save` 安全限制：filePath 必須在 `content/` 目錄內，否則回傳 400。
+
+### 圖片貼上（image paste）
+
+- 在編輯模式 textarea 貼上圖片（Ctrl+V / Cmd+V）可觸發自動上傳
+- 上傳至 `public/images/`，檔名格式：`{Date.now()}-{4位隨機碼}.{ext}`
+- 上傳期間游標位置插入 `![uploading...]()` 佔位，完成後替換為 `![](/images/檔名)`
+- 支援 PNG、JPEG、WebP、GIF；檔案大小上限 10MB
+- API：`POST /api/upload-image`（multipart/form-data `file`），回傳 `{ url: "/images/..." }`
+
+## 筆記顯示模式切換
+
+分類頁 Topbar 有 list / grid icon 切換按鈕（由 `ViewToggle.tsx` 提供）：
+
+- **列表模式（list）**：單欄橫向排列，顯示標題、日期、描述、tags
+- **卡片模式（grid）**：格狀卡片排列（`repeat(auto-fill, minmax(240px, 1fr))`）
+- 選擇透過 `localStorage` key `note-view-mode` 持久化，預設為 `list`
+- 全站所有分類頁共用同一設定；首頁（分類列表頁）不受影響
+- 響應式：小螢幕兩種模式皆自動單欄
 
 ## 新增分類 / 新增文章（UI）
 
