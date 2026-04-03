@@ -135,7 +135,7 @@ export default function MarkdownEditor({ rawContent, notePath }: Props) {
                 },
               }}
             >
-              {content}
+              {matter(content).content}
             </ReactMarkdown>
           </div>
         </div>
