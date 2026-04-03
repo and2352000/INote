@@ -5,6 +5,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import remarkGfm from 'remark-gfm'
 import { getCategories, getPost, getPostsByCategory, getAdjacentPosts } from '@/lib/posts'
 import ArticleClient from '@/components/ArticleClient'
+import { mdxComponents } from '@/components/MdxComponents'
 import path from 'path'
 
 interface Props {
@@ -60,7 +61,7 @@ export default async function PostPage({ params }: Props) {
           </div>
         </header>
         <div className="note-body">
-          <MDXRemote source={post.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
+          <MDXRemote source={post.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} components={mdxComponents} />
         </div>
         {(prev || next) && (
           <nav className="note-nav">

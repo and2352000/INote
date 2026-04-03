@@ -3,6 +3,9 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import matter from 'gray-matter'
+import dynamic from 'next/dynamic'
+
+const MermaidBlock = dynamic(() => import('./MermaidBlock'), { ssr: false })
 
 interface Props {
   rawContent: string
@@ -117,7 +120,21 @@ export default function MarkdownEditor({ rawContent, notePath }: Props) {
         </div>
         <div className="preview-pane">
           <div className="note-body editor-preview-body">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                pre(props) {
+                  const child = props.children as React.ReactElement<{ className?: string; children?: string }>
+                  if (
+                    child?.props?.className === 'language-mermaid' &&
+                    typeof child.props.children === 'string'
+                  ) {
+                    return <MermaidBlock code={child.props.children.trim()} />
+                  }
+                  return <pre {...props} />
+                },
+              }}
+            >
               {content}
             </ReactMarkdown>
           </div>

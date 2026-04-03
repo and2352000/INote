@@ -407,6 +407,15 @@ a:hover { text-decoration: underline; }
 .note-body hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
 .note-body a { color: var(--text-link); }
 
+/* ===== Mermaid ===== */
+.mermaid-container { margin: 1em 0; text-align: center; }
+.mermaid-container svg { max-width: 100%; height: auto; }
+.mermaid-error { margin: 1em 0; padding: 12px 16px; border: 1px solid var(--danger, #d00); border-radius: 8px; background: var(--bg-secondary); }
+.mermaid-error-title { margin: 0 0 8px; font-weight: 600; color: var(--danger, #d00); }
+.mermaid-error-detail { margin: 0 0 8px; font-size: 0.85em; color: var(--text-muted); white-space: pre-wrap; }
+.mermaid-error-source { margin: 0; background: var(--code-bg); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.85em; }
+.mermaid-error-source code { background: none; padding: 0; }
+
 /* ===== Note Navigation ===== */
 .note-nav {
   display: flex;

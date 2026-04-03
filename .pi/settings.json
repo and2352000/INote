@@ -1,0 +1,10 @@
+{
+  "skills": [
+    "../.claude/skills"
+  ],
+  "enableSkillCommands": true,
+  "projectGuidance": {
+    "docDir": "../doc",
+    "claudeRules": "../.claude/rules/doc/README.md"
+  }
+}

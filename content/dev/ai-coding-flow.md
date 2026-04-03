@@ -180,3 +180,45 @@ AI 閱讀文件的方式通常是整份讀取。雖然現在 AI 的 context wind
 
 其實很多時候，AI 只需要看到 `ls -l` 的輸出，就能判斷要去找哪些檔案，不需要把全部內容都塞進來。這也是我在這個專案裡把新功能開發文件**以時間序列方式管理**的原因：每次只給 AI 最近、最相關的那幾份文件，不讓它淹沒在歷史資訊裡。這樣做的副作用也很好——人類可以做小範圍的審查，也方便事後溯源。
 
+## 文件管理架構
+其實就是照著組織的需求以及原本的流程去走
+
+```mermaid
+graph TD
+    Epic["Epic<br/>大方向目標"]
+
+    Epic --> US1["User Story 1<br/>需求定義"]
+    Epic --> US2["User Story 2<br/>需求定義"]
+    Epic --> US3["User Story 3<br/>需求定義"]
+
+    US1 --> TS1["Tech Spec 1<br/>技術方案"]
+    US1 --> TS2["Tech Spec 2<br/>技術方案"]
+    US2 --> TS3["Tech Spec 3<br/>技術方案"]
+    US3 --> TS4["Tech Spec 4<br/>技術方案"]
+
+    TS1 --> Impl1["實作<br/>AI + 人工"]
+    TS2 --> Impl2["實作<br/>AI + 人工"]
+    TS3 --> Impl3["實作<br/>AI + 人工"]
+    TS4 --> Impl4["實作<br/>AI + 人工"]
+
+    style Epic fill:#4A90D9,stroke:#2A6CB0,color:#fff
+    style US1 fill:#67B168,stroke:#4A8F4B,color:#fff
+    style US2 fill:#67B168,stroke:#4A8F4B,color:#fff
+    style US3 fill:#67B168,stroke:#4A8F4B,color:#fff
+    style TS1 fill:#F5A623,stroke:#D4891A,color:#fff
+    style TS2 fill:#F5A623,stroke:#D4891A,color:#fff
+    style TS3 fill:#F5A623,stroke:#D4891A,color:#fff
+    style TS4 fill:#F5A623,stroke:#D4891A,color:#fff
+    style Impl1 fill:#D0021B,stroke:#A80115,color:#fff
+    style Impl2 fill:#D0021B,stroke:#A80115,color:#fff
+    style Impl3 fill:#D0021B,stroke:#A80115,color:#fff
+    style Impl4 fill:#D0021B,stroke:#A80115,color:#fff
+```
+
+每一層都有明確的 checkpoint：
+
+- **Epic → User Story**：拆解大目標為可交付的獨立需求
+- **User Story → Tech Spec**：需求 `approved` 後才進入技術設計
+- **Tech Spec → 實作**：技術方案確認後才開始寫程式碼
+
+這樣的層級管理確保每個功能都有跡可循，也讓 AI 在任何一層都能快速取得所需的上下文，不需要讀完整個專案歷史。
